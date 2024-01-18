@@ -110,7 +110,7 @@ class InferDdcolorColorizationFactory(dataprocess.CTaskFactory):
         # URL of documentation
         self.info.documentation_link = ""
         # Code source repository
-        self.info.repository = ""
+        self.info.repository = "https://github.com/Ikomia-hub/infer_ddcolor_colorization"
         self.info.original_repository = "https://github.com/piddnad/DDColor/tree/master"
         # Keywords used for search
         self.info.keywords = "color, restoration, colorisation"
