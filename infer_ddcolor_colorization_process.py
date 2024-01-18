@@ -75,6 +75,7 @@ class InferDdcolorColorization(dataprocess.C2dImageTask):
             plugin_folder = os.path.dirname(os.path.abspath(__file__))
             os.environ['MODELSCOPE_CACHE'] = os.path.join(plugin_folder, "cached_models")
             self.pipeline = pipeline(Tasks.image_colorization, model='damo/cv_ddcolor_image-colorization')
+            param.update = False
 
         result = self.pipeline(img_input.get_image())
 
