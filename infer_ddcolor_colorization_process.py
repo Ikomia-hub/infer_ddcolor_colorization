@@ -1,10 +1,11 @@
 import copy
-from ikomia import core, dataprocess
-import cv2
-from modelscope.outputs import OutputKeys
-from modelscope.pipelines import pipeline
-from modelscope.utils.constant import Tasks
 import os
+import torch
+from ikomia import utils, core, dataprocess
+
+from infer_ddcolor_colorization.ddcolor.infer import MODEL_NAMES
+from infer_ddcolor_colorization.ddcolor.infer import InferDDColor
+
 
 # --------------------
 # - Class to handle the algorithm parameters
@@ -15,21 +16,25 @@ class InferDdcolorColorizationParam(core.CWorkflowTaskParam):
     def __init__(self):
         core.CWorkflowTaskParam.__init__(self)
         # Place default value initialization here
-        # Example : self.window_size = 25
-        self.update = True
-
+        self.model_name = MODEL_NAMES[0]
+        self.input_size = 512
+        self.cuda = torch.cuda.is_available()
 
     def set_values(self, params):
         # Set parameters values from Ikomia Studio or API
         # Parameters values are stored as string and accessible like a python dict
-        # Example : self.window_size = int(params["window_size"])
-        self.update = True
+        self.model_name = params["model_name"]
+        self.input_size = int(params["input_size"])
+        self.cuda = utils.strtobool(params["cuda"])
 
     def get_values(self):
         # Send parameters values to Ikomia Studio or API
         # Create the specific dict structure (string container)
-        params = {}
-        # Example : paramMap["window_size"] = str(self.window_size)
+        params = {
+            "model_name": self.model_name,
+            "input_size": str(self.input_size),
+            "cuda": str(self.cuda),
+        }
         return params
 
 
@@ -42,9 +47,8 @@ class InferDdcolorColorization(dataprocess.C2dImageTask):
     def __init__(self, name, param):
         dataprocess.C2dImageTask.__init__(self, name)
         # Add input/output of the algorithm here
-        # Example :  self.add_input(dataprocess.CImageIO())
-        #           self.add_output(dataprocess.CImageIO())
-        self.pipeline = None
+
+        self.ddcolor = InferDDColor(os.path.join(os.path.dirname(os.path.realpath(__file__)), "weights"))
 
         # Create parameters object
         if param is None:
@@ -62,26 +66,20 @@ class InferDdcolorColorization(dataprocess.C2dImageTask):
         # Call begin_task_run() for initialization
         self.begin_task_run()
 
-        # Examples :
-        # Get input :
+        param = self.get_param_object()
+        self.ddcolor.set_parameters(param.model_name, param.input_size, param.cuda)
+
+        # Get input
         img_input = self.get_input(0)
 
-        # Get output :
+        # Run ddcolor inference
+        result = self.ddcolor.run(img_input.get_image())
+
+        # Set output
         img_output = self.get_output(0)
+        img_output.set_image(result)
 
-        param = self.get_param_object()
-
-        if param.update or self.pipeline is None:
-            plugin_folder = os.path.dirname(os.path.abspath(__file__))
-            os.environ['MODELSCOPE_CACHE'] = os.path.join(plugin_folder, "cached_models")
-            self.pipeline = pipeline(Tasks.image_colorization, model='damo/cv_ddcolor_image-colorization')
-            param.update = False
-
-        result = self.pipeline(img_input.get_image())
-
-        img_output.set_image(result['output_img'][:, :, ::-1])
-
-        # Step progress bar (Ikomia Studio):
+        # Step progress bar (Ikomia Studio)
         self.emit_step_progress()
 
         # Call end_task_run() to finalize process
@@ -100,12 +98,12 @@ class InferDdcolorColorizationFactory(dataprocess.CTaskFactory):
         self.info.name = "infer_ddcolor_colorization"
         self.info.short_description = "Algorithm to colorize grayscale image"
         # relative path -> as displayed in Ikomia Studio algorithm tree
-        self.info.path = "Plugins/Python"
+        self.info.path = "Plugins/Python/Colorization"
         self.info.version = "1.0.0"
-        # self.info.icon_path = "your path to a specific icon"
+        self.info.icon_path = "images/icon.png"
         self.info.authors = "Kang, Xiaoyang and Yang, Tao and Ouyang, Wenqi and Ren, Peiran and Li, Lingzhi and Xie, Xuansong"
         self.info.article = "DDColor: Towards Photo-Realistic Image Colorization via Dual Decoders"
-        self.info.journal = "Proceedings of the IEEE/CVF International Conference on Computer Vision"
+        self.info.journal = "ICCV"
         self.info.year = 2023
         self.info.license = "Apache-2.0"
         # URL of documentation

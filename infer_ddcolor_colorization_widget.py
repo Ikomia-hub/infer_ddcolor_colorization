@@ -1,6 +1,8 @@
+import torch
 from ikomia import core, dataprocess
 from ikomia.utils import pyqtutils, qtconversion
 from infer_ddcolor_colorization.infer_ddcolor_colorization_process import InferDdcolorColorizationParam
+from infer_ddcolor_colorization.ddcolor.infer import MODEL_NAMES
 
 # PyQt GUI framework
 from PyQt5.QtWidgets import *
@@ -22,6 +24,25 @@ class InferDdcolorColorizationWidget(core.CWorkflowTaskWidget):
 
         # Create layout : QGridLayout by default
         self.grid_layout = QGridLayout()
+
+        # GPU computing
+        self.check_cuda = pyqtutils.append_check(self.grid_layout,
+                                                 "Cuda",
+                                                 self.parameters.cuda and torch.cuda.is_available())
+
+        # Model name
+        self.combo_model_name = pyqtutils.append_combo(self.grid_layout, "Model name")
+        for model_name in MODEL_NAMES:
+            self.combo_model_name.addItem(model_name)
+
+        self.combo_model_name.setCurrentText(self.parameters.model_name)
+
+        # Model input size
+        self.spin_input_size = pyqtutils.append_spin(self.grid_layout,
+                                                     "Input size",
+                                                     self.parameters.input_size,
+                                                     min=128, max=4096)
+
         # PyQt -> Qt wrapping
         layout_ptr = qtconversion.PyQtToQt(self.grid_layout)
 
@@ -30,9 +51,10 @@ class InferDdcolorColorizationWidget(core.CWorkflowTaskWidget):
 
     def on_apply(self):
         # Apply button clicked slot
-
         # Get parameters from widget
-        # Example : self.parameters.window_size = self.spin_window_size.value()
+        self.parameters.cuda = self.check_cuda.isChecked()
+        self.parameters.model_name = self.combo_model_name.currentText()
+        self.parameters.input_size = self.spin_input_size.value()
 
         # Send signal to launch the algorithm main function
         self.emit_apply(self.parameters)

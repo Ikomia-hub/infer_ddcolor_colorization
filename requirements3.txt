@@ -1,3 +1,0 @@
---find-links https://modelscope.oss-cn-beijing.aliyuncs.com/releases/repo.html
-
-modelscope[cv]==1.11.0

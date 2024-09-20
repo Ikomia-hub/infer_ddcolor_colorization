@@ -1,3 +1,0 @@
---find-links https://data.pyg.org/whl/torch-2.1.0+cu118.html
-
-torch-scatter==2.1.2
