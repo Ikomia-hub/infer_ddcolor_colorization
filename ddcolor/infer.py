@@ -36,6 +36,9 @@ class InferDDColor:
     def set_parameters(self, model_name: str = "ddcolor_paper", input_size: int = 512, cuda: bool = True):
         update_colorizer = self.colorizer is None
 
+        if input_size % 32 != 0:
+            raise ValueError("Invalid parameters: input size must be multiple of 32.")
+
         if self.model is None or self.model_name != model_name:
             self.model = DDColorHF.from_pretrained(f"piddnad/{model_name}",
                                                    cache_dir=self.model_folder)
