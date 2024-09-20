@@ -41,7 +41,7 @@ from ikomia.dataprocess.workflow import Workflow
 from ikomia.utils.displayIO import display
 
 # Init your workflow
-wf = Workflow()
+wf = Workflow("Colorization workflow")
 
 # Add algorithm
 algo = wf.add_task(name="infer_ddcolor_colorization", auto_connect=True)
@@ -59,6 +59,38 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 - If you haven't started using Ikomia Studio yet, download and install it from [this page](https://www.ikomia.ai/studio).
 
 - For additional guidance on getting started with Ikomia Studio, check out [this blog post](https://www.ikomia.ai/blog/how-to-get-started-with-ikomia-studio).
+
+## :pencil: Set algorithm parameters
+
+- cuda (bool): enable/disable cuda acceleration (if available)
+- model_name (str): ddcolor models
+  - ddcolor_paper: original model from scientific paper.
+  - ddcolor_paper_tiny: lightweight version of ddcolor model, using the same training scheme as ddcolor_paper.
+  - ddcolor_modelscope: model trained using the same data cleaning scheme as BigColor, it can get the best qualitative results with little degrading FID performance.
+  - ddcolor_artistic: model trained with an extended dataset containing many high-quality artistic images. Also, colorfulness loss is not used during training, so there may be fewer unreasonable color artifacts.
+- input_size (int): image input resolution in pixels
+
+
+```python
+from ikomia.dataprocess.workflow import Workflow
+from ikomia.utils.displayIO import display
+
+# Init your workflow
+wf = Workflow("Colorization workflow")
+
+# Add algorithm
+algo = wf.add_task(name="infer_ddcolor_colorization", auto_connect=True)
+algo.set_parameters({
+    "cuda": "True",
+    "model_name": "ddcolor_paper_tiny",
+    "input_size": "1024"
+})
+
+# Run on your image  
+wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_ddcolor_colorization/main/images/original.jpg")
+
+display(algo.get_output(0).get_image())
+```
 
 ## :mag: Explore algorithm outputs
 
