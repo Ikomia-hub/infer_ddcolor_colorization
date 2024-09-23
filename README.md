@@ -19,9 +19,9 @@
     </a> 
 </p>
 
-![computed](https://raw.githubusercontent.com/Ikomia-hub/infer_ddcolor_colorization/main/images/result.png)
+![computed](https://raw.githubusercontent.com/Ikomia-hub/infer_ddcolor_colorization/main/images/result.jpg)
 
-![original](https://unsplash.com/photos/CIian0EjHAU/download?ixid=M3wxMjA3fDB8MXxhbGx8fHx8fHx8fHwxNzA1NTc0Nzk0fA&force=true)
+![original](https://raw.githubusercontent.com/Ikomia-hub/infer_ddcolor_colorization/main/images/original.jpg)
 Original picture made by <a href="https://unsplash.com/fr/@adamlittmandavis?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Adam Littman Davis</a> on <a href="https://unsplash.com/fr/photos/photo-en-niveaux-de-gris-de-montagnes-et-darbres-CIian0EjHAU?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
   
 ## :rocket: Use with Ikomia API
