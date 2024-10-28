@@ -99,7 +99,7 @@ class InferDdcolorColorizationFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Algorithm to colorize grayscale image"
         # relative path -> as displayed in Ikomia Studio algorithm tree
         self.info.path = "Plugins/Python/Colorization"
-        self.info.version = "1.0.0"
+        self.info.version = "1.0.1"
         self.info.icon_path = "images/icon.png"
         self.info.authors = "Kang, Xiaoyang and Yang, Tao and Ouyang, Wenqi and Ren, Peiran and Li, Lingzhi and Xie, Xuansong"
         self.info.article = "DDColor: Towards Photo-Realistic Image Colorization via Dual Decoders"

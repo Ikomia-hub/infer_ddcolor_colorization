@@ -70,7 +70,9 @@ class ImageColorizationPipeline(object):
         img_gray_rgb = cv2.cvtColor(img_gray_lab, cv2.COLOR_LAB2RGB)
 
         tensor_gray_rgb = torch.from_numpy(img_gray_rgb.transpose((2, 0, 1))).float().unsqueeze(0).to(self.device)
-        output_ab = self.model(tensor_gray_rgb).cpu()  # (1, 2, self.height, self.width)
+
+        with torch.no_grad():
+            output_ab = self.model(tensor_gray_rgb).cpu()  # (1, 2, self.height, self.width)
 
         # resize ab -> concat original l -> rgb
         output_ab_resize = F.interpolate(output_ab, size=(self.height, self.width))[0].float().numpy().transpose(1, 2, 0)
