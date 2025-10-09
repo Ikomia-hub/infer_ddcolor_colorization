@@ -55,6 +55,7 @@ class InferDdcolorColorizationWidget(core.CWorkflowTaskWidget):
         self.parameters.cuda = self.check_cuda.isChecked()
         self.parameters.model_name = self.combo_model_name.currentText()
         self.parameters.input_size = self.spin_input_size.value()
+        self.parameters.update = True
 
         # Send signal to launch the algorithm main function
         self.emit_apply(self.parameters)
