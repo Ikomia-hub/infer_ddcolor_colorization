@@ -19,6 +19,7 @@ class InferDdcolorColorizationParam(core.CWorkflowTaskParam):
         self.model_name = MODEL_NAMES[0]
         self.input_size = 512
         self.cuda = torch.cuda.is_available()
+        self.update = False
 
     def set_values(self, params):
         # Set parameters values from Ikomia Studio or API
@@ -26,6 +27,7 @@ class InferDdcolorColorizationParam(core.CWorkflowTaskParam):
         self.model_name = params["model_name"]
         self.input_size = int(params["input_size"])
         self.cuda = utils.strtobool(params["cuda"])
+        self.update = True
 
     def get_values(self):
         # Send parameters values to Ikomia Studio or API
@@ -61,13 +63,20 @@ class InferDdcolorColorization(dataprocess.C2dImageTask):
         # This is handled by the main progress bar of Ikomia Studio
         return 1
 
+    def init_long_process(self):
+        param = self.get_param_object()
+        self.ddcolor.set_parameters(param.model_name, param.input_size, param.cuda)
+        super().init_long_process()
+
     def run(self):
         # Main function of your algorithm
         # Call begin_task_run() for initialization
         self.begin_task_run()
 
         param = self.get_param_object()
-        self.ddcolor.set_parameters(param.model_name, param.input_size, param.cuda)
+        if param.update:
+            self.ddcolor.set_parameters(param.model_name, param.input_size, param.cuda)
+            param.update = False
 
         # Get input
         img_input = self.get_input(0)
@@ -99,7 +108,8 @@ class InferDdcolorColorizationFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Algorithm to colorize grayscale image"
         # relative path -> as displayed in Ikomia Studio algorithm tree
         self.info.path = "Plugins/Python/Colorization"
-        self.info.version = "1.0.1"
+        self.info.version = "1.1.0"
+        self.info.min_ikomia_version = "0.15.0"
         self.info.icon_path = "images/icon.png"
         self.info.authors = "Kang, Xiaoyang and Yang, Tao and Ouyang, Wenqi and Ren, Peiran and Li, Lingzhi and Xie, Xuansong"
         self.info.article = "DDColor: Towards Photo-Realistic Image Colorization via Dual Decoders"
@@ -117,6 +127,10 @@ class InferDdcolorColorizationFactory(dataprocess.CTaskFactory):
         self.info.algo_type = core.AlgoType.INFER
         # Algorithms tasks
         self.info.algo_tasks = "COLORIZATION"
+        self.info.hardware_config.min_cpu = 4
+        self.info.hardware_config.min_ram = 16
+        self.info.hardware_config.gpu_required = False
+        self.info.hardware_config.min_vram = 6
 
     def create(self, param=None):
         # Create algorithm object
