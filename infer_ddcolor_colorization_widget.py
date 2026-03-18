@@ -1,11 +1,13 @@
+# PyQt GUI framework
+from PyQt6.QtWidgets import *
+
 import torch
+
 from ikomia import core, dataprocess
 from ikomia.utils import pyqtutils, qtconversion
+
 from infer_ddcolor_colorization.infer_ddcolor_colorization_process import InferDdcolorColorizationParam
 from infer_ddcolor_colorization.ddcolor.infer import MODEL_NAMES
-
-# PyQt GUI framework
-from PyQt5.QtWidgets import *
 
 
 # --------------------
